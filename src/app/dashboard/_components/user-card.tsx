@@ -1,34 +1,25 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import axios from "axios";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/providers/auth-provider";
-import UserEditDialog from "../profile/_components/user-edit-dialog";
+import { Button } from "@/components/ui/button";
+import { User } from "@/types/user";
 
-export default function UserCard() {
-  const { user, error, isError, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <Card className="w-100">
-        <CardContent className="flex items-center justify-center py-10">
-          <Loader2 className="h-10 w-10 animate-spin" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Card className="w-100">
-        <CardContent className="py-6 text-center text-red-500">
-          {error || "No user found"}
-        </CardContent>
-      </Card>
-    );
-  }
+export default function UserCard({
+  user,
+  reFetchUser,
+}: {
+  user: User;
+  reFetchUser: () => Promise<void>;
+}) {
+  const updateStatus = async () => {
+    await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/users/${user!.id}`, {
+      status: user!.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+    });
+    await reFetchUser();
+  };
 
   return (
     <>
@@ -42,10 +33,11 @@ export default function UserCard() {
             <CardTitle className="text-lg">{user!.name}</CardTitle>
             <p className="text-sm text-muted-foreground">{user!.email}</p>
           </div>
-          <UserEditDialog />
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">User ID: {user!.id}</p>
+          <Button onClick={updateStatus}>
+            Mark as {user!.status === "ACTIVE" ? "Inactive" : "Active"}
+          </Button>
         </CardContent>
       </Card>
     </>

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, User, ShoppingBag, PowerOff } from "lucide-react";
+import { toast } from "sonner";
+import { redirect, usePathname } from "next/navigation";
+import { Home, User, PowerOff } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import Logo from "@/components/ui/logo";
@@ -32,6 +33,12 @@ export default function Sidebar({ className }: { className?: string }) {
       icon: User,
     },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast("Signed out successfully!");
+    redirect("/sign-in");
+  };
 
   return (
     <ShadcnSidebar className={cn(["border-r bg-background", className])}>
@@ -65,7 +72,7 @@ export default function Sidebar({ className }: { className?: string }) {
       </SidebarContent>
 
       <SidebarFooter className="border-t p-4 text-xs text-muted-foreground">
-        <Button variant="destructive" onClick={() => signOut()}>
+        <Button variant="destructive" onClick={handleSignOut}>
           <PowerOff />
           Sign Out
         </Button>

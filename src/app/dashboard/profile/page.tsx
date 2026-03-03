@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { redirect } from "next/navigation";
 import {
   Loader2,
   Mail,
@@ -15,11 +16,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import UserEditDialog from "./_components/user-edit-dialog";
 import { useAuth } from "@/providers/auth-provider";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export default function UserPage() {
   const { user, error, isError, isLoading } = useAuth();
-  const router = useRouter();
-  if (!user) router.push("/sign-up");
 
   if (isLoading) {
     return (
@@ -37,7 +37,10 @@ export default function UserPage() {
     );
   }
 
-  if (!user) router.push("/sign-in");
+  if (!user) {
+    toast("You have to be authenticated in order to access this page.");
+    redirect("/sign-up");
+  }
 
   return (
     <div className="w-full flex flex-col gap-8 p-8">
@@ -55,7 +58,12 @@ export default function UserPage() {
           </div>
         </div>
 
-        <UserEditDialog />
+        <div className="flex flex-col item-center justify center gap-2">
+          <UserEditDialog />
+          {!user.emailVerified && (
+            <Button onClick={() => {}}>Verify via Email</Button>
+          )}
+        </div>
       </div>
 
       {/* User Details */}
