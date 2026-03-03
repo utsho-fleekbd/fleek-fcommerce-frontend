@@ -53,13 +53,25 @@ export default function AuthProvider({
     setIsLoading(true);
 
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
-        {
+      const response = await axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
-        },
-      );
-      setUser(response.data.data);
+        })
+        .then((res) => {
+          if (res.status === 400) {
+            axios
+              .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`)
+              .then((res) => setAccessToken(res.data.accessToken));
+            return axios
+              .get(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              })
+              .then((res) => res.data);
+          } else {
+            return res.data;
+          }
+        });
+      setUser(response.data);
     } catch (err: unknown) {
       console.error(err);
       setIsError(true);
@@ -72,14 +84,6 @@ export default function AuthProvider({
   useEffect(() => {
     if (accessToken) {
       fetchUser();
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-    } else {
-      localStorage.removeItem("accessToken");
     }
   }, [accessToken]);
 
@@ -109,7 +113,6 @@ export default function AuthProvider({
               password,
             })
             .then((res) => res.data);
-          console.log(response);
           setAccessToken(response.accessToken as string);
         },
 

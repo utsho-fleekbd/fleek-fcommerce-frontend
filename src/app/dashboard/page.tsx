@@ -9,5 +9,9 @@ export default function DashboardPage() {
 
   if (!user) redirect("/sign-up");
 
-  return <UserCard />;
+  return (
+    <div className="w-full min-h-screen mx-auto flex items-center justify-center">
+      <UserCard />
+    </div>
+  );
 }

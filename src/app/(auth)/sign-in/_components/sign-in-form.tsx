@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import FormField from "@/components/ui/form-field";
@@ -22,16 +23,20 @@ export interface SignInInput {
 
 export default function SignInForm() {
   const {
+    reset,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignInInput>();
   const { signIn } = useAuth();
+  const router = useRouter();
 
   const onSubmit = async (data: SignInInput) => {
     const { email, password } = data;
     await signIn(email, password);
     toast("Successfully signed in.");
+    reset();
+    router.push("/dashboard");
   };
 
   return (

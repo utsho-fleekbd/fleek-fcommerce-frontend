@@ -94,6 +94,8 @@ export default function UserEditDialog() {
                 <Image
                   src={preview}
                   alt="Preview"
+                  width={96}
+                  height={96}
                   className="mt-2 h-24 w-24 object-cover rounded-md"
                 />
               )}
